@@ -30,8 +30,6 @@
 | MoveIt 2 baseline | End-to-end mission |
 ## Manipulation mission demo
 
-![Panda manipulation mission demo](docs/evidence/manipulation_mission_preview.webp)
-
 [▶ Download or play the full mission demo (MP4)](https://github.com/yashrk7174/ROS2-Resilient-Manipulation-Testbed/raw/refs/heads/main/docs/evidence/manipulation_mission_demo.mp4)
 
 ## What this project demonstrates
