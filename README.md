@@ -28,10 +28,11 @@
 | ![Collision-aware Panda planning](docs/evidence/collision_aware_planning_rviz.png) | ![Verified stale-pose delay detection](docs/evidence/stale_pose_delay_detection_verified.png) |
 
 | MoveIt 2 baseline | End-to-end mission |
-|:---:|:---:|
-| ![Panda MoveIt baseline](docs/evidence/panda_moveit_rviz_baseline.png) | ![Manipulation mission execution](docs/evidence/manipulation_mission_execution.png) |
+## Manipulation mission demo
 
-▶️ [Watch the manipulation mission demo](docs/evidence/manipulation_mission_demo.mp4)
+![Panda manipulation mission demo](docs/evidence/manipulation_mission_preview.webp)
+
+[▶ Download or play the full mission demo (MP4)](https://github.com/yashrk7174/ROS2-Resilient-Manipulation-Testbed/raw/refs/heads/main/docs/evidence/manipulation_mission_demo.mp4)
 
 ## What this project demonstrates
 
