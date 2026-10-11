@@ -32,25 +32,25 @@ The pose-estimation result was measured over **500 synchronized ground-truth / r
 
 ```mermaid
 flowchart TD
-    A[Ground-truth object pose] --> B[Controlled uncertainty / fault injection]
-    B --> C[/object_pose_measurement]
+    A["Ground-truth object pose"] --> B["Controlled uncertainty / fault injection"]
+    B --> C["/object_pose_measurement"]
 
-    C --> D[Raw-pose baseline]
-    C --> E[Robust pose estimator]
+    C --> D["Raw-pose baseline"]
+    C --> E["Robust pose estimator"]
 
-    E --> E1[Linear Kalman filter]
-    E --> E2[NIS outlier gate]
-    E --> E3[Stale-sample rejection]
-    E --> E4[Dropout watchdog]
-    E --> F[/object_pose_estimate]
+    E --> E1["Linear Kalman filter"]
+    E --> E2["NIS outlier gate"]
+    E --> E3["Stale-sample rejection"]
+    E --> E4["Dropout watchdog"]
+    E --> F["/object_pose_estimate"]
 
-    D --> G[Pose validity gate]
+    D --> G["Pose validity gate"]
     F --> G
 
-    G --> H[MoveIt 2 / OMPL planning]
-    H --> I[Manipulation mission]
-    I --> J[Failure detection]
-    J --> K[Bounded recovery or SAFE_ABORT]
+    G --> H["MoveIt 2 / OMPL planning"]
+    H --> I["Manipulation mission"]
+    I --> J["Failure detection"]
+    J --> K["Bounded recovery or SAFE_ABORT"]
 ```
 
 The **baseline and resilient configurations use the same mission implementation**. Resilience is enabled through runtime configuration rather than through two separate mission programs.
