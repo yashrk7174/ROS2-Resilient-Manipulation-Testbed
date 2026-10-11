@@ -3,10 +3,9 @@
 <package format="3">
   <name>resilient_manipulation_core</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="khisteyash.workspace@gmail.com">khisteyash</maintainer>
-  <license>TODO: License declaration</license>
-
+<description>ROS 2 manipulation testbed for collision-aware planning, robust object-pose estimation, controlled fault injection, bounded recovery, and engineering validation.</description>
+<maintainer email="khisteyash.workspace@gmail.com">Yash Khiste</maintainer>
+<license>MIT</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
