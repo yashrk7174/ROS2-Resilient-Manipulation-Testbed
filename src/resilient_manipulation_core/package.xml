@@ -13,6 +13,7 @@
   <depend>sensor_msgs</depend>
   <depend>moveit_ros_planning_interface</depend>
   <depend>geometry_msgs</depend>
+  <depend>visualization_msgs</depend>
   <depend>moveit_msgs</depend>
   <depend>shape_msgs</depend>
   <exec_depend>moveit_configs_utils</exec_depend>

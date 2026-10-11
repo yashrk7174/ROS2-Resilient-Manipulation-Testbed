@@ -1,0 +1,47 @@
+{
+  "phase": "Phase 9",
+  "test_suite": "Automated Scenario Regression",
+  "generated_at": "2026-10-11T21:22:55",
+  "total_scenarios": 6,
+  "passed": 6,
+  "failed": 0,
+  "overall_status": "PASS",
+  "scenarios": [
+    {
+      "scenario_id": "P9-S01",
+      "status": "PASS",
+      "runner_exit_code": 0,
+      "duration_seconds": 22.836
+    },
+    {
+      "scenario_id": "P9-S02",
+      "status": "PASS",
+      "runner_exit_code": 0,
+      "duration_seconds": 12.92
+    },
+    {
+      "scenario_id": "P9-S03",
+      "status": "PASS",
+      "runner_exit_code": 0,
+      "duration_seconds": 9.264
+    },
+    {
+      "scenario_id": "P9-S04",
+      "status": "PASS",
+      "runner_exit_code": 0,
+      "duration_seconds": 12.875
+    },
+    {
+      "scenario_id": "P9-S05",
+      "status": "PASS",
+      "runner_exit_code": 0,
+      "duration_seconds": 7.003
+    },
+    {
+      "scenario_id": "P9-S06",
+      "status": "PASS",
+      "runner_exit_code": 0,
+      "duration_seconds": 7.887
+    }
+  ]
+}

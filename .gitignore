@@ -42,3 +42,10 @@ screenshots/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Local development backups
+*.save
+*.phase*_backup
+*.phase*_verified
+*_before_phase*.cpp
+*_for_chat.cpp

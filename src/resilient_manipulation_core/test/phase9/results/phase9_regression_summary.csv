@@ -1,0 +1,7 @@
+scenario_id,status,runner_exit_code,duration_seconds
+P9-S01,PASS,0,22.836
+P9-S02,PASS,0,12.92
+P9-S03,PASS,0,9.264
+P9-S04,PASS,0,12.875
+P9-S05,PASS,0,7.003
+P9-S06,PASS,0,7.887

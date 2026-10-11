@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 find_package(moveit_msgs REQUIRED)
 find_package(shape_msgs REQUIRED)
 # ============================================================
@@ -184,6 +185,88 @@ ament_target_dependencies(
   geometry_msgs
 )
 
+add_executable(
+  pose_filter
+  src/pose_filter.cpp
+)
+
+target_compile_features(
+  pose_filter
+  PUBLIC
+    cxx_std_17
+)
+
+ament_target_dependencies(
+  pose_filter
+  rclcpp
+  geometry_msgs
+)
+
+add_executable(
+  pose_estimation_validator
+  src/pose_estimation_validator.cpp
+)
+
+target_compile_features(
+  pose_estimation_validator
+  PUBLIC
+    cxx_std_17
+)
+
+ament_target_dependencies(
+  pose_estimation_validator
+  rclcpp
+  geometry_msgs
+)
+
+add_executable(
+  pose_bias_validator
+  src/pose_bias_validator.cpp
+)
+
+target_compile_features(
+  pose_bias_validator
+  PUBLIC
+    cxx_std_17
+)
+
+ament_target_dependencies(
+  pose_bias_validator
+  rclcpp
+  geometry_msgs
+)
+
+add_executable(
+  pose_outlier_validator
+  src/pose_outlier_validator.cpp
+)
+
+target_compile_features(
+  pose_outlier_validator
+  PUBLIC
+    cxx_std_17
+)
+
+ament_target_dependencies(
+  pose_outlier_validator
+  rclcpp
+  geometry_msgs
+)
+
+#  pose_visualizer
+
+add_executable(
+  pose_visualizer
+  src/pose_visualizer.cpp
+)
+
+ament_target_dependencies(
+  pose_visualizer
+  rclcpp
+  geometry_msgs
+  visualization_msgs
+)
+
 
 
 # Install executables
@@ -195,7 +278,12 @@ install(
     obstacle_avoidance_planner
     manipulation_mission
     pose_uncertainty_injector
-  DESTINATION lib/${PROJECT_NAME}
+    pose_filter
+    pose_estimation_validator
+    pose_bias_validator
+    pose_outlier_validator
+    pose_visualizer
+DESTINATION lib/${PROJECT_NAME}
 )
 
 # Testing

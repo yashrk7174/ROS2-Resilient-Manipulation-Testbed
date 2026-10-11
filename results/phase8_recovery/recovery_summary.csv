@@ -1,0 +1,7 @@
+test_id,scenario,expected_behavior,recovery_attempts,recovery_duration_ms,final_outcome,status
+8.2A,Fresh estimate,No recovery required,0,0.0,Mission continued,PASS
+8.2B,Stale estimate,Reacquire fresh estimate and continue,1,1778.0,Recovered and mission completed,PASS
+8.3A,Nominal planning,No planning recovery required,0,0.0,Mission completed,PASS
+8.3B,Injected single Pose-goal planning failure,Refresh state and re-plan once,1,64.0,Recovered and mission completed,PASS
+8.3C,Injected persistent Pose-goal planning failure,Retry once then safe abort,1,0.0,Safe abort after retry exhausted,PASS
+8.4B,Injected Pose-goal execution failure,Detect execution failure and safe abort,0,0.0,Safe abort without automatic execution retry,PASS

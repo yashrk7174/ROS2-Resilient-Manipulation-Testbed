@@ -1,0 +1,4 @@
+/moveit_simple_controller_manager:
+  ros__parameters:
+    trajectory_execution.allowed_execution_duration_scaling: 2.5
+    trajectory_execution.allowed_goal_duration_margin: 1.0

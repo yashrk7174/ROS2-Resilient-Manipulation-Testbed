@@ -1,0 +1,9 @@
+test_id,failure_category,test_condition,expected_behavior,recovery_attempts,recovery_duration_ms,final_outcome,status
+8.2A,Perception,Fresh valid estimate,Continue without recovery,0,0.0,Mission completed,PASS
+8.2B,Perception,Stale estimate followed by fresh estimate,Reacquire and continue,1,1778.0,Recovered and mission completed,PASS
+8.3A,Planning,Nominal MoveIt planning,No planning recovery required,0,0.0,Mission completed,PASS
+8.3B,Planning,Injected first Pose-goal planning failure,Refresh state and re-plan once,1,64.0,Recovered and mission completed,PASS
+8.3C,Planning,Injected persistent Pose-goal planning failure,One retry then safe abort,1,0.0,Safe abort,PASS
+8.4A,Execution,Nominal trajectory execution,Continue normally,0,0.0,Mission completed,PASS
+8.4B,Execution,Injected Pose-goal execution failure,Abort without blind retry,0,0.0,Safe abort,PASS
+8.5A,Perception,Persistent stale estimate with no new timestamp,Wait maximum 3 seconds then abort,0,3000.0,Safe abort before planning,PASS

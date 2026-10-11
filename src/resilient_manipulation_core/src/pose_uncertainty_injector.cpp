@@ -1,9 +1,9 @@
 #include <chrono>
 #include <cmath>
 #include <cstddef>
-#include <deque>
 #include <functional>
 #include <memory>
+#include <random>
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
@@ -12,39 +12,45 @@ using namespace std::chrono_literals;
 
 
 // ============================================================
-//  Stale / Delayed Pose Measurement Injector
+// Phase 7.6B Test Source
+// Changed Target + Gaussian Measurement Noise
 //
-// Ground truth:
-//   Published continuously.
+// True object position:
+//   [0.387, 0.050, 0.470] m
 //
-// Measurement:
-//   Published continuously, but after buffer warm-up it
-//   represents the ground-truth pose from 10 samples earlier.
+// Measurement noise:
+//   zero-mean Gaussian
+//   sigma = 5 mm per XYZ axis
 //
-// A deterministic X-position change is used only as a test
-// stimulus so that stale data can be observed quantitatively.
+// Purpose:
+//   Verify that the manipulation mission consumes the
+//   filtered /object_pose_estimate rather than raw jitter.
 //
-// No Gaussian noise.
 // No systematic bias.
-// No outlier.
+// No gross outlier.
 // No dropout.
+// No stale timestamp.
 // ============================================================
 
 class PoseUncertaintyInjector : public rclcpp::Node
 {
 public:
   PoseUncertaintyInjector()
-  : Node("pose_uncertainty_injector")
+  : Node("pose_uncertainty_injector"),
+    generator_(42),
+    noise_distribution_(0.0, NOISE_STDDEV)
   {
     ground_truth_publisher_ =
-      this->create_publisher<geometry_msgs::msg::PoseStamped>(
-        "/object_pose_ground_truth",
-        10);
+      this->create_publisher<
+        geometry_msgs::msg::PoseStamped>(
+          "/object_pose_ground_truth",
+          10);
 
     measurement_publisher_ =
-      this->create_publisher<geometry_msgs::msg::PoseStamped>(
-        "/object_pose_measurement",
-        10);
+      this->create_publisher<
+        geometry_msgs::msg::PoseStamped>(
+          "/object_pose_measurement",
+          10);
 
     timer_ =
       this->create_wall_timer(
@@ -53,119 +59,54 @@ public:
           &PoseUncertaintyInjector::publishPose,
           this));
 
-    RCLCPP_INFO(
-      this->get_logger(),
-      "==============================================");
 
     RCLCPP_INFO(
       this->get_logger(),
-      "PHASE 5.6 — STALE / DELAYED POSE SOURCE");
+      "============================================================");
 
     RCLCPP_INFO(
       this->get_logger(),
-      "Mode: FIXED SAMPLE DELAY");
+      "PHASE 7.6B — NOISY ESTIMATED TARGET TEST");
 
     RCLCPP_INFO(
       this->get_logger(),
-      "Base task pose: x=%.3f y=%.3f z=%.3f m",
-      BASE_X,
-      GROUND_TRUTH_Y,
-      GROUND_TRUTH_Z);
+      "True target       : [%.3f %.3f %.3f] m",
+      TARGET_X,
+      TARGET_Y,
+      TARGET_Z);
 
     RCLCPP_INFO(
       this->get_logger(),
-      "Test motion: X changes by %.3f m (%.1f mm)",
-      TEST_MOTION_X,
-      TEST_MOTION_X * 1000.0);
+      "Gaussian sigma    : %.1f mm / axis",
+      NOISE_STDDEV * 1000.0);
 
     RCLCPP_INFO(
       this->get_logger(),
-      "Measurement delay: %zu samples (~%.1f s nominal)",
-      DELAY_SAMPLES,
-      static_cast<double>(DELAY_SAMPLES) * 0.1);
+      "Random seed       : 42");
 
     RCLCPP_INFO(
       this->get_logger(),
-      "Measurement remains continuously available");
+      "Publish rate      : 10 Hz");
 
     RCLCPP_INFO(
       this->get_logger(),
-      "Frame: world | Publish rate: 10 Hz");
-
-    RCLCPP_INFO(
-      this->get_logger(),
-      "==============================================");
+      "============================================================");
   }
 
 
 private:
 
-  // ==========================================================
-  //  baseline task pose
-  // ==========================================================
+  static constexpr double TARGET_X = 0.387;
+  static constexpr double TARGET_Y = 0.050;
+  static constexpr double TARGET_Z = 0.470;
 
-  static constexpr double BASE_X = 0.387;
-  static constexpr double GROUND_TRUTH_Y = 0.000;
-  static constexpr double GROUND_TRUTH_Z = 0.470;
+  static constexpr double NOISE_STDDEV = 0.005;
 
-
-  // ==========================================================
-  // Controlled test stimulus
-  //
-  // Ground truth alternates between:
-  //
-  // 0.387 m
-  // 0.407 m
-  //
-  // every 30 samples.
-  //
-  // This is NOT a fault.
-  // It only makes measurement delay observable.
-  // ==========================================================
-
-  static constexpr double TEST_MOTION_X = 0.020;
-  static constexpr std::size_t MOTION_INTERVAL = 30;
-
-
-  // ==========================================================
-  // Delay configuration
-  //
-  // 10 samples at nominal 10 Hz ≈ 1 second.
-  // ==========================================================
-
-  static constexpr std::size_t DELAY_SAMPLES = 10;
-
-
-  // ==========================================================
-  // Determine current ground-truth X position
-  // ==========================================================
-
-  double getGroundTruthX() const
-  {
-    const std::size_t motion_phase =
-      (sample_count_ / MOTION_INTERVAL) % 2;
-
-    if (motion_phase == 0)
-    {
-      return BASE_X;
-    }
-
-    return BASE_X + TEST_MOTION_X;
-  }
-
-
-  // ==========================================================
-  // Timer callback
-  // ==========================================================
 
   void publishPose()
   {
     ++sample_count_;
 
-
-    // --------------------------------------------------------
-    // Current ground truth
-    // --------------------------------------------------------
 
     geometry_msgs::msg::PoseStamped ground_truth;
 
@@ -176,13 +117,13 @@ private:
       "world";
 
     ground_truth.pose.position.x =
-      getGroundTruthX();
+      TARGET_X;
 
     ground_truth.pose.position.y =
-      GROUND_TRUTH_Y;
+      TARGET_Y;
 
     ground_truth.pose.position.z =
-      GROUND_TRUTH_Z;
+      TARGET_Z;
 
     ground_truth.pose.orientation.x = 0.0;
     ground_truth.pose.orientation.y = 0.0;
@@ -190,164 +131,66 @@ private:
     ground_truth.pose.orientation.w = 1.0;
 
 
-    // Ground truth always published.
-    ground_truth_publisher_->publish(
-      ground_truth);
+    geometry_msgs::msg::PoseStamped measurement =
+      ground_truth;
 
 
-    // --------------------------------------------------------
-    // Add current truth sample to delay buffer
-    // --------------------------------------------------------
+    measurement.pose.position.x +=
+      noise_distribution_(generator_);
 
-    pose_buffer_.push_back(
-      ground_truth);
+    measurement.pose.position.y +=
+      noise_distribution_(generator_);
 
-
-    geometry_msgs::msg::PoseStamped measurement;
-
-    bool delay_active = false;
+    measurement.pose.position.z +=
+      noise_distribution_(generator_);
 
 
-    // --------------------------------------------------------
-    // After enough samples exist, publish the oldest
-    // buffered sample.
-    //
-    // This produces exactly DELAY_SAMPLES of sample delay.
-    // --------------------------------------------------------
-
-    if (pose_buffer_.size() > DELAY_SAMPLES)
-    {
-      measurement =
-        pose_buffer_.front();
-
-      pose_buffer_.pop_front();
-
-      delay_active = true;
-    }
-    else
-    {
-      // Buffer warm-up.
-      //
-      // Publish current truth so measurement remains available.
-      // No artificial dropout is introduced.
-      measurement =
-        ground_truth;
-    }
-
-
-    // --------------------------------------------------------
-    // Publish measurement
-    // --------------------------------------------------------
-
-    measurement_publisher_->publish(
-      measurement);
-
-
-    // --------------------------------------------------------
-    // Quantify spatial error
-    // --------------------------------------------------------
-
-    const double error_x =
+    const double dx =
       measurement.pose.position.x -
       ground_truth.pose.position.x;
 
-    const double error_y =
+    const double dy =
       measurement.pose.position.y -
       ground_truth.pose.position.y;
 
-    const double error_z =
+    const double dz =
       measurement.pose.position.z -
       ground_truth.pose.position.z;
 
-    const double position_error =
+
+    const double raw_error =
       std::sqrt(
-        error_x * error_x +
-        error_y * error_y +
-        error_z * error_z);
+        dx * dx +
+        dy * dy +
+        dz * dz);
 
 
-    // --------------------------------------------------------
-    // Quantify measurement age
-    //
-    // Important:
-    // measurement.header.stamp belongs to the OLD sample.
-    //
-    // --------------------------------------------------------
+    ground_truth_publisher_->publish(
+      ground_truth);
 
-    const rclcpp::Time now =
-      this->get_clock()->now();
-
-    const rclcpp::Time measurement_stamp(
-      measurement.header.stamp);
-
-    const double measurement_age =
-      (now - measurement_stamp).seconds();
-
-
-    // --------------------------------------------------------
-    // Logging
-    // --------------------------------------------------------
-
-    if (!delay_active)
-    {
-      if (sample_count_ == 1)
-      {
-        RCLCPP_INFO(
-          this->get_logger(),
-          "DELAY BUFFER WARM-UP START");
-      }
-
-      if (sample_count_ == DELAY_SAMPLES)
-      {
-        RCLCPP_INFO(
-          this->get_logger(),
-          "DELAY BUFFER WARM-UP COMPLETE");
-      }
-    }
+    measurement_publisher_->publish(
+      measurement);
 
 
     if (sample_count_ % 10 == 0)
     {
       RCLCPP_INFO(
         this->get_logger(),
-        "%s | sample=%zu | "
-        "GT_X=%.3f | "
-        "MEAS_X=%.3f | "
-        "error=%.3f m | "
-        "age=%.3f s",
-        delay_active ? "DELAYED" : "WARMUP",
+        "sample=%zu | "
+        "GT [%.3f %.3f %.3f] | "
+        "RAW [%.3f %.3f %.3f] | "
+        "raw_error=%.2f mm",
         sample_count_,
         ground_truth.pose.position.x,
+        ground_truth.pose.position.y,
+        ground_truth.pose.position.z,
         measurement.pose.position.x,
-        position_error,
-        measurement_age);
-    }
-
-
-    // Highlight moments when stale data becomes spatially wrong.
-    if (
-      delay_active &&
-      position_error > 0.001)
-    {
-      RCLCPP_WARN(
-        this->get_logger(),
-        "STALE MEASUREMENT | sample=%zu | "
-        "current GT_X=%.3f | "
-        "old MEAS_X=%.3f | "
-        "position error=%.3f m | "
-        "measurement age=%.3f s",
-        sample_count_,
-        ground_truth.pose.position.x,
-        measurement.pose.position.x,
-        position_error,
-        measurement_age);
+        measurement.pose.position.y,
+        measurement.pose.position.z,
+        raw_error * 1000.0);
     }
   }
 
-
-  // ==========================================================
-  // ROS2 interfaces
-  // ==========================================================
 
   rclcpp::Publisher<
     geometry_msgs::msg::PoseStamped>::SharedPtr
@@ -360,22 +203,15 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
 
 
-  // ==========================================================
-  // Delay buffer
-  // ==========================================================
+  std::mt19937 generator_;
 
-  std::deque<
-    geometry_msgs::msg::PoseStamped>
-    pose_buffer_;
+  std::normal_distribution<double>
+    noise_distribution_;
 
 
   std::size_t sample_count_{0};
 };
 
-
-// ============================================================
-// Main
-// ============================================================
 
 int main(int argc, char * argv[])
 {

@@ -1,0 +1,9 @@
+test_id,scenario,baseline_expected,resilient_expected,primary_metric,purpose
+P10-V01,Nominal fresh pose,MISSION_SUCCESS,MISSION_SUCCESS,mission_success,Verify resilience does not degrade nominal operation
+P10-V02,Gaussian pose noise,HIGHER_POSE_ERROR,LOWER_POSE_ERROR,pose_rmse_mm,Quantify estimation improvement
+P10-V03,Injected pose outlier,RAW_OUTLIER_ACCEPTED,OUTLIER_REJECTED,invalid_estimate_acceptance,Verify NIS-based robustness
+P10-V04,Temporary stale/dropout estimate,SAFE_ABORT_OR_FAILURE,RECOVERED,recovery_success,Measure bounded recovery benefit
+P10-V05,Persistent stale estimate,SAFE_ABORT,SAFE_ABORT,safe_abort_behavior,Verify resilient system remains fail-safe when recovery is impossible
+P10-V06,Single planning failure,NO_RECOVERY,RECOVERED,planning_recovery_success,Measure bounded re-planning benefit
+P10-V07,Persistent planning failure,SAFE_ABORT,SAFE_ABORT,retry_bound,Verify failure remains bounded
+P10-V08,Execution failure,SAFE_ABORT,SAFE_ABORT,automatic_execution_retry,Verify no unsafe blind execution retry

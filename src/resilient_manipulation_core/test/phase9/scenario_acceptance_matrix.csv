@@ -1,0 +1,7 @@
+scenario_id,scenario_name,input_condition,expected_recovery,expected_terminal_behavior,expected_exit_code,test_pass_condition
+P9-S01,Fresh nominal,Valid fresh estimate,NOT_REQUIRED,MISSION_SUCCESS,0,Mission completes and no recovery is required
+P9-S02,Stale to fresh recovery,Initial stale estimate followed by new valid estimate,RECOVERED,MISSION_SUCCESS,0,Estimate recovery succeeds and mission completes
+P9-S03,Persistent stale estimate,Stale estimate with no new valid timestamp,SAFE_ABORT,SAFE_ABORT_BEFORE_PLANNING,1,Bounded estimate recovery expires and mission aborts before planning
+P9-S04,Single planning failure,First Pose-goal planning attempt forced to fail,RECOVERED,MISSION_SUCCESS,0,Exactly one planning retry occurs and mission completes
+P9-S05,Persistent planning failure,Every selected Pose-goal planning attempt forced to fail,SAFE_ABORT,SAFE_ABORT_AFTER_RETRY_EXHAUSTED,1,One bounded retry occurs and mission aborts without further retries
+P9-S06,Execution failure,Pose-goal execution failure injected,SAFE_ABORT,SAFE_ABORT_NO_EXECUTION_RETRY,1,Execution failure causes immediate safe abort with automatic retry disabled
